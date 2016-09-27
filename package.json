@@ -1,0 +1,21 @@
+{
+  "name"    : "code-the-microbit",
+  "version" : "1.0.0",
+  "description": "Blocks / Javascript editor",
+  "author": "Microsoft",
+  "repository": {
+      "url": "https://github.com/Microsoft/pxt-microbit-electron"
+  },
+  "license": "MIT",
+  "main"    : "main.js",
+  "scripts": {
+      "rebuild-native": "node ./dev_tools/rebuild-native.js",
+      "start": "node_modules/.bin/electron ."
+  },
+  "devDependencies": {
+      "electron": "^1.4.1",
+      "electron-rebuild": "^1.2.1",
+      "pxt-microbit": "*",
+      "pxt-core": "*"
+  }
+}
