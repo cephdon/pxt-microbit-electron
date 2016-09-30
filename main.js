@@ -7,7 +7,7 @@ let win
 const cliPath = path.join(process.cwd(), "node_modules/pxt-microbit") 
 
 function startServerAndCreateWindow() {
-  pxt.mainCli(cliPath, ["serve", "-no-browser"])
+  pxt.mainCli(cliPath, ["serve", "-no-browser", "-electron"])
   createWindow()
 }
 
