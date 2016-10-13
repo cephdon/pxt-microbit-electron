@@ -3,24 +3,44 @@
 let childProcess = require('child_process');
 let electron = require('electron');
 let electronRebuild = require('electron-rebuild');
+let fs = require('fs');
 let path = require('path');
 
-let defaultNodeModules = path.join(__dirname, '..', 'node_modules');
+let localNodeModules = path.join(__dirname, '..', 'node_modules');
 let foldersToRebuild = [
-    defaultNodeModules
-];
-let symLinkedFolders = [
-    path.join(path.dirname(require.resolve('pxt-core')), '..', 'node_modules')
+    localNodeModules
 ];
 
-console.log('Rebuilding native modules...');
+function findFinalLinkTarget(p) {
+    let foundFinal = false;
+    let target = p;
 
-symLinkedFolders.forEach((f) => {
-    if (f.indexOf(defaultNodeModules) !== 0) {
-        foldersToRebuild.push(f);
+    while (!foundFinal) {
+        try {
+            target = fs.readlinkSync(target);
+        } catch (e) {
+            foundFinal = true;
+        }
+    }
+
+    return target;
+}
+
+console.log('Detecting linked modules ("npm link")...');
+fs.readdirSync(localNodeModules).forEach((m) => {
+    let moduleRootPath = path.resolve(localNodeModules, m);
+    let stat = fs.statSync(moduleRootPath);
+
+    if (stat.isDirectory()) {
+        let target = path.resolve(findFinalLinkTarget(moduleRootPath));
+
+        if (target !== moduleRootPath) {
+            console.log(`    Detected npm link: ${m}`);
+            foldersToRebuild.push(path.join(target, 'node_modules'));
+        }
     }
 });
-
+console.log('Rebuilding native modules...');
 electronRebuild.shouldRebuildNativeModules(electron)
     .then((shouldBuild) => {
         if (!shouldBuild) {
@@ -38,7 +58,7 @@ electronRebuild.shouldRebuildNativeModules(electron)
         return foldersToRebuild.reduce((soFar, currentFolder) => {
             return soFar
                 .then(() => {
-                    console.log(currentFolder);
+                    console.log(`    ${currentFolder}`);
                     return electronRebuild.rebuildNativeModules(electronVersion, currentFolder);
                 })
                 .then(() => electronRebuild.preGypFixRun(currentFolder, true, electron))

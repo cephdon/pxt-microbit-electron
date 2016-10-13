@@ -8,6 +8,13 @@
             "program": "${workspaceRoot}/main.js",
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+        },
+        {
+            "name": "Debug rebuild-native.js",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/dev_tools/rebuild-native.js",
+            "cwd": "${workspaceRoot}"
         }
     ]
 }

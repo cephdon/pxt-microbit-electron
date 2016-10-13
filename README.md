@@ -39,12 +39,30 @@ Please see the Error section below if you get errors while running the app (such
 ## Errors while installing or running
 If your Node version differs from Electron's Node version, you will need to rebuild some native modules in the dependencies of the web app.
 
-#### Requirements
+### Requirements
 - [Python 2.x](https://www.python.org/downloads/) (__NOT 3.x__); make sure `python` is in your global Path
 - (Windows only) Visual Studio; any of the newer versions will do (Community 2015 works fine)
 
-#### Rebuilding the native modules
+### Rebuilding the native modules
 Once you have the above dependencies:
 ```
 npm run rebuild-native
+```
+
+### Still have errors?
+If you still can't run the Electron app even after rebuilding the native modules, you can try the following:
+```
+npm uninstall electron
+npm uninstall electron-rebuild
+npm install
+npm run rebuild-native
+```
+
+### `pxt serve` errors
+Rebuilding the native modules can break `pxt serve` outside of the Electron app. To fix, uninstall the native modules from your PXT repo, and reinstall them:
+
+```
+npm uninstall serialport
+npm uninstall ...
+npm install
 ```
