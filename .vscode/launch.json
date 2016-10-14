@@ -15,6 +15,13 @@
             "request": "launch",
             "program": "${workspaceRoot}/dev_tools/rebuild-native.js",
             "cwd": "${workspaceRoot}"
+        },
+        {
+            "name": "Debug package.js",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/dev_tools/package.js",
+            "cwd": "${workspaceRoot}"
         }
     ]
 }
