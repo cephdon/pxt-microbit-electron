@@ -14,7 +14,6 @@ let knownNativeModules = [
         cleanDir: path.join("build", "release")
     }
 ];
-
 let localNodeModules = path.join(__dirname, "..", "node_modules");
 let foldersToRebuild = [
     localNodeModules
@@ -33,6 +32,34 @@ function findFinalLinkTarget(p) {
     }
 
     return target;
+}
+
+function cleanKnownModulesRecursive(p) {
+    knownNativeModules.forEach((nm) => {
+        let fullPackagePath = path.join(p, nm.packageName);
+
+        if (fs.existsSync(fullPackagePath)) {
+            let fullBuildDir = path.join(fullPackagePath, nm.cleanDir);
+
+            console.log(`    Cleaning ${fullBuildDir}`);
+            rimraf.sync(fullBuildDir);
+        }
+    });
+
+    let recurseFolders = [];
+
+    fs.readdirSync(p).forEach((item) => {
+        let fullDependencyPath = path.join(p, item);
+        let nodeModulesPath = path.join(fullDependencyPath, "node_modules");
+
+        if (fs.statSync(fullDependencyPath).isDirectory() && fs.existsSync(nodeModulesPath)) {
+            recurseFolders.push(nodeModulesPath);
+        }
+    });
+
+    recurseFolders.forEach((f) => {
+        cleanKnownModulesRecursive(f);
+    });
 }
 
 electronRebuild.shouldRebuildNativeModules(electron)
@@ -60,16 +87,7 @@ electronRebuild.shouldRebuildNativeModules(electron)
         console.log("Cleaning known native modules...");
         // TODO: Also clean up nested dependencies, not just our direct dependencies
         foldersToRebuild.forEach((f) => {
-            knownNativeModules.forEach((nm) => {
-                let fullPackagePath = path.join(f, nm.packageName);
-
-                if (fs.existsSync(fullPackagePath)) {
-                    let fullBuildDir = path.join(fullPackagePath, nm.cleanDir);
-
-                    console.log(`    Cleaning ${fullBuildDir}`);
-                    rimraf.sync(fullBuildDir);
-                }
-            });
+            cleanKnownModulesRecursive(f);
         });
 
         console.log("Rebuilding native modules...");

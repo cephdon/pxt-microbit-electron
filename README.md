@@ -66,3 +66,42 @@ npm uninstall serialport
 npm uninstall ...
 npm install
 ```
+
+## Packaging the app for release
+Run the following:
+
+```
+npm run package
+```
+
+### Note on npm link
+If you've linked `pxt-core` and `pxt-microbit`, packaging won't work (electron-packager seems to support only 1 level of symlink, whereas `npm link` generates 2 symlinks). You will need to uninstall your linked repos and reinstall them via NPM:
+```
+npm uninstall pxt-core
+npm uninstall pxt-microbit
+npm install
+```
+
+If you need to use a non-released version of `pxt-core` or `pxt-microbit`, you can still do it without `npm link` by installing them from their cloned repo. Make sure their repos are checked out at the branch you wish to package in the Electron app, and then run:
+```
+npm install ../pxt
+npm install ../pxt-microbit
+```
+
+Remember to run `npm run rebuild-native` before packaging, and make sure the app is working by running `npm start`.
+
+## Adding a dependency that is or contains a native modules
+Whenever you add a dependency to package.json, there is a chance that it (or one of its nested dependencies) has a native component. If that is the case, and the Electron app stops working even after you run `npm run rebuild-native`, you may need to modify our `rebuild-native.js` script.
+
+`electron-rebuild` does not always succeed in cleaning up the native modules that it rebuilds. In our `dev_tools/rebuild-native.js` script, we maintain a list of known native modules that we manually clean up. You will need to figure out where the module keeps its built native components, and add an entry to the `knownNativeModules` array in the `rebuild-native.js` script.
+
+For example, serialport keeps its built components under `build/release`, so we added the following entry:
+
+```
+let knownNativeModules = [
+    {
+        packageName: "serialport",
+        cleanDir: path.join("build", "release")
+    }
+];
+```

@@ -12,7 +12,9 @@ let options = {
     ignore: [
         /\.vscode/,
         /dev_tools/,
-        /projects/
+        /projects/,
+        /\.gitignore/,
+        /README\.md/
     ],
     //name: "Code the Microbit", // TODO: We can omit this and use what's in package.json, or we can have a kid-friendly name here (package.json uses "-" symbols)
     out: path.resolve(__dirname, "..", "built"),
